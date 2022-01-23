@@ -43,7 +43,8 @@ battleRouter.patch('/battle/reset', (req: Request, res: Response) => {
 })
 
 battleRouter.post('/battle/start', (req: Request, res: Response) => {
-    return res.json(battleService.startBattle(req));
+    const id = +req.body.id;
+    return res.json(battleService.startBattle(id));
 })
 
 export default battleRouter;
