@@ -7,26 +7,42 @@ const battleRouter = Router();
 const battleService = new BattleService();
 
 battleRouter.get('/battles', (req: Request, res: Response) => {
-    return res.json(battleService.getBattles());
+    const battles = battleService.getBattles();
+    return battles.then(b => res.json(b)).catch(error => {
+        console.log('errrrrr: ' + error)
+        return error;
+    });
 });
 
-battleRouter.post('battle', (req: Request, res: Response) => {
-    return res.json(battleService.createBattle(req));
+battleRouter.post('/battle', (req: Request, res: Response) => {
+    const { name } = req.body;
+    const battle = battleService.createBattle({name, statusID: 1});
+    return battle.then(b => res.json(b));
 })
 
-battleRouter.post('battle/army', (req: Request, res: Response) => {
-    return res.json(battleService.createArmy(req));
+battleRouter.post('/battle/army', (req: Request, res: Response) => {
+    const army = battleService.createArmy({...req.body, battleUnits: req.body.units});
+    return army.then(a => res.json(a)).catch(error => {
+        console.log('errrrrr: ' + error)
+        return error;
+    });
 })
 
-battleRouter.get('battle/log', (req: Request, res: Response) => {
-    return res.json(battleService.getLog(req));
+battleRouter.get('/battle/log', (req: Request, res: Response) => {
+    const id = +req.query.id;
+    const logs = battleService.getLog(id);
+    return logs.then(l => res.json(l)).catch(error => {
+        console.log('errrrrr: ' + error)
+        return error;
+    });
 })
 
-battleRouter.patch('battle/reset', (req: Request, res: Response) => {
-    return res.json(battleService.resetBattle(req));
+battleRouter.patch('/battle/reset', (req: Request, res: Response) => {
+    const id = +req.body.id;
+    return res.json(battleService.resetBattle(id));
 })
 
-battleRouter.post('battle/start', (req: Request, res: Response) => {
+battleRouter.post('/battle/start', (req: Request, res: Response) => {
     return res.json(battleService.startBattle(req));
 })
 

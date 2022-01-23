@@ -25,7 +25,7 @@ export const Army = sequelize.define("Army", {
             key: 'id'
         }
     },
-    StrategyID: {
+    strategyID: {
         type: DataTypes.INTEGER,
         references: {
             model: 'Strategy',
