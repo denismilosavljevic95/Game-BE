@@ -1,5 +1,5 @@
 {
-  "name": "time-tracking",
+  "name": "game",
   "version": "1.0.0",
   "description": "Lightweight express sequelize app",
   "main": "dist/index.js",
