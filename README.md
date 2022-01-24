@@ -19,3 +19,9 @@ Install dependence
 
 #### npm run dev
 Start project
+
+
+## Postman API
+```
+https://documenter.getpostman.com/view/12974479/UVe9QUCq
+```
