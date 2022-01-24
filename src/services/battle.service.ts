@@ -4,6 +4,7 @@ import { Battle } from '../models/battle';
 import { Army } from '../models/army';
 import { Log } from '../models/log';
 import { Statuses } from '../models/statuses';
+import { Op } from 'sequelize';
 
 export class BattleService {
     // Strategy options
@@ -41,26 +42,23 @@ export class BattleService {
 
     }
 
-    startBattle(id: number) {
-        let battle = Battle.findOne({where: {battleID: id}}).then(result => result);
-        let armies: [];
+    async startBattle(id: number) {
+        let battle: any = await Battle.findByPk(id);
+        let armies: any;
         let armiesCount = 0;
-        Army.findAndCountAll({where: {battleID: id, battleUnits: {gt: 0}}}).then(result => {
-            armies.push(...result.rows);
-            armiesCount = result.count;
-        });
-
+        const armyResult = await Army.findAndCountAll({distinct: true, where: {battleID: id, battleUnits: {[Op.gt]: 0}}})
+        armies = armyResult.rows;
+        armiesCount = armyResult.count; 
         if ((battle.statusID == this._STATUS_READY && armiesCount >= 3) || battle.statusID == this._STATUS_IN_PROGRESS) {
             if (armiesCount > 1) {
-                armies.forEach((element, index) => {
+                armies.forEach(async (element: any, index: any) => {
                     let armiesCopy = [...armies];
-                    armiesCopy = armiesCopy.filter(item => item !== index)
+                    armiesCopy = armiesCopy.filter(item => item !== index && item.battleUnits > 0)
 
-                    const army = Army.findOne({where: {id: element.id}}).then(result => result);
-                    const target = this.targetPick(army.strategyID, armiesCopy);
-                    const potentialAttact = this.potentialAttact(target);
+                    const army: any = await Army.findOne({where: {id: element.id}});
+                    const target: any = this.targetPick(army.strategyID, armiesCopy);
+                    const potentialAttact = this.potentialAttact(element);
                     let damage = this.potentialDamage(army);
-
                     if (potentialAttact) {
                         const health = target.battleUnits - damage;
                         if (health <= 0) {
@@ -68,21 +66,22 @@ export class BattleService {
                         } else {
                             target.battleUnits = health;
                         }
+                        await Army.update({ battleUnits: target.battleUnits }, { where: {id: target.id} })
                     } else {
                         damage = 0;
                     }
-                    Log.create({
+                    await Log.create({
                         damage,
                         battleID: id,
                         attactID: army.id,
                         defenseID: target.id
                     })
                 });
-                Battle.update({ statusID: this._STATUS_IN_PROGRESS }, { where: {id: id} })
+                await Battle.update({ statusID: this._STATUS_IN_PROGRESS }, { where: {id: id} })
             }
 
-            if (armiesCount = 1) {
-                Battle.update({ statusID: this._STATUS_FINISHED }, { where: {id: id} })
+            if (armiesCount == 1) {
+                await Battle.update({ statusID: this._STATUS_FINISHED }, { where: {id: id} })
             }
 
             return 'Round finished';
@@ -110,8 +109,8 @@ export class BattleService {
     }
 
     pickWeakest(armies: Array<{}>) {
-        let weakest = armies[0];
-        armies.forEach(item => {
+        let weakest: any = armies[0];
+        armies.forEach((item: any) => {
             if (item.battleUnits < weakest.battleUnits) {
                 weakest = item;
             }
@@ -120,8 +119,8 @@ export class BattleService {
     }
 
     pickStrongest(armies: Array<{}>) {
-        let weakest = armies[0];
-        armies.forEach(item => {
+        let weakest: any = armies[0];
+        armies.forEach((item: any) => {
             if (item.battleUnits > weakest.battleUnits) {
                 weakest = item;
             }
@@ -129,16 +128,16 @@ export class BattleService {
         return weakest;
     }
 
-    potentialAttact(army: {}) {
+    potentialAttact(army: any) {
         const randomNumber = Math.floor(Math.random() * 100) + 1;
         let percent = army.battleUnits;
         if (percent < 10) {
             percent = 10;
         }
-        return randomNumber > percent ? true : false; 
+        return percent > randomNumber ? true : false; 
     }
 
-    potentialDamage(army: {}) {
+    potentialDamage(army: any) {
         if (army.battleUnits > 1) {
             return Math.floor(0.5 * army.battleUnits);
         } else {

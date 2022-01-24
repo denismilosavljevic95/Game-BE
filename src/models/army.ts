@@ -1,7 +1,29 @@
 // src/models/army.ts
 
-import { DataTypes } from 'sequelize'
+import { DataTypes, Model, Optional } from 'sequelize'
 import { sequelize } from '../instances/sequelize'
+
+// export interface ArmyViewModel {
+//     id: number
+//     name: string,
+//     units: string,
+//     battleUnits: number,
+//     battleID: number,
+//     strategyID: number
+// }
+
+// interface ArmyAttributes {
+//     id: number
+//     name: string,
+//     units: string,
+//     battleUnits: number,
+//     battleID: number,
+//     strategyID: number
+//   }
+// export interface ArmyCreationAttributes extends Optional<ArmyAttributes, "id"> {}
+// interface ArmyInstance
+// extends Model<ArmyAttributes, ArmyCreationAttributes>,
+// ArmyAttributes {}
 
 export const Army = sequelize.define("Army", {
     id: {
