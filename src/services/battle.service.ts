@@ -3,8 +3,7 @@
 import { Battle } from '../models/battle';
 import { Army } from '../models/army';
 import { Log } from '../models/log';
-import { Statuses } from '../models/statuses';
-import { Op } from 'sequelize';
+import sequelize, { Op } from 'sequelize';
 
 export class BattleService {
     // Strategy options
@@ -32,13 +31,11 @@ export class BattleService {
         return Log.findAll({where: {battleID: id}}).then(logs => logs);
     }
 
-    resetBattle(id: number) {
-        return Log.destroy({where: {battleID: id}})
-            .then(result => {
-                Battle.update({ statusID: this._STATUS_READY }, { where: {id: id} }).then(update => update)
-                // reset army 
-            })
-            .catch(error => error)
+    async resetBattle(id: number) {
+        await Log.destroy({where: {battleID: id}})
+        await Battle.update({ statusID: this._STATUS_READY }, { where: {id: id} })
+        const armies = await Army.findAll({where: {battleID: id}});
+        armies.forEach(async (item: any) => await Army.update({battleUnits: item.units}, {where: {id: item.id}}))
 
     }
 
