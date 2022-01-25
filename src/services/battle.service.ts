@@ -16,7 +16,10 @@ export class BattleService {
     private readonly _STATUS_FINISHED = 3;
 
     getBattles() {
-        return Battle.findAll().then(battles => battles);
+        return Battle.findAll({include: [{
+            model: Army,
+         required: false
+           }]}).then(battles => battles);
     }
 
     createBattle(data: {}) {
