@@ -2,6 +2,7 @@
 
 import { DataTypes } from 'sequelize'
 import { sequelize } from '../instances/sequelize'
+import { Army } from './army';
 
 export const Log = sequelize.define("Log", {
     id: {
@@ -22,17 +23,20 @@ export const Log = sequelize.define("Log", {
     attactID: {
         type: DataTypes.INTEGER,
         references: {
-            model: 'Battle',
+            model: 'Army',
             key: 'id'
         }
     },
     defenseID: {
         type: DataTypes.INTEGER,
         references: {
-            model: 'Battle',
+            model: 'Army',
             key: 'id'
         }
     }
 }, {
     tableName: "Log"
 });
+
+Log.hasOne(Army, {as: 'Attack', foreignKey : 'id', sourceKey: 'attactID'})
+Log.hasOne(Army, {as: 'Defense', foreignKey : 'id', sourceKey: 'defenseID'})

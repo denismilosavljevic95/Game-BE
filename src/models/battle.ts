@@ -2,7 +2,6 @@
 
 import { DataTypes } from 'sequelize'
 import { sequelize } from '../instances/sequelize'
-import { Statuses } from './statuses';
 
 export const Battle = sequelize.define("Battle", {
     id: {

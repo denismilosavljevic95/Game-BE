@@ -28,7 +28,7 @@ export class BattleService {
     }
 
     getLog(id: number) {
-        return Log.findAll({where: {battleID: id}}).then(logs => logs);
+        return Log.findAll({where: {battleID: id}, include: [{model: Army, as: 'Attack'}, {model: Army, as: 'Defense'}]}).then(logs => logs);
     }
 
     async resetBattle(id: number) {
@@ -36,7 +36,6 @@ export class BattleService {
         await Battle.update({ statusID: this._STATUS_READY }, { where: {id: id} })
         const armies = await Army.findAll({where: {battleID: id}});
         armies.forEach(async (item: any) => await Army.update({battleUnits: item.units}, {where: {id: item.id}}))
-
     }
 
     async startBattle(id: number) {
