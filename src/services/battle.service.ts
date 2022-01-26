@@ -92,6 +92,11 @@ export class BattleService {
         }
     }
 
+    battleInfo(id: number) {
+        return Battle.findOne({where: {id}, include: [{model: Army, required: false}]}).then(battle => battle);
+    }
+
+    // utils
     targetPick(strategy: number, armies: Array<{}>) {
         switch (strategy) {
             case this._STRATEGY_RANDOM:

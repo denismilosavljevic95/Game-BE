@@ -47,4 +47,13 @@ battleRouter.post('/battle/start', (req: Request, res: Response) => {
     return res.json(battleService.startBattle(id));
 })
 
+battleRouter.get('/battle/info', (req: Request, res: Response) => {
+    const id = +req.query.id;
+    const battleInfo = battleService.battleInfo(id);
+    return battleInfo.then(info => res.json(info)).catch(error => {
+        console.log('errrrrr: ' + error)
+        return error;
+    });
+})
+
 export default battleRouter;
